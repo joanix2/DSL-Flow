@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -12,6 +12,7 @@ import "@xyflow/react/dist/style.css";
 import OutputGraphMenu from "./OutputGraphMenu";
 import FunctionButtons from "./FunctionButtons";
 import TextEditor from "./TextEditor";
+import { Trash2 } from "lucide-react";
 
 interface NodeData {
   label: string;
@@ -38,6 +39,7 @@ const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 export const GraphPanel = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const trashRef = useRef<HTMLDivElement>(null);
 
   const onConnect = useCallback(
     (params: Edge | any) =>
@@ -73,6 +75,28 @@ export const GraphPanel = () => {
     setNodes((nds) => [...nds, newNode]);
   };
 
+  // Lorsqu'un nœud termine d'être déplacé, vérifier s'il a été déposé sur la poubelle
+  // Vérifier si un nœud est déplacé sur la poubelle et le supprimer
+  const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
+    const trashElement = trashRef.current?.getBoundingClientRect();
+    if (!trashElement) return;
+
+    const { clientX, clientY } = event;
+    if (
+      clientX >= trashElement.left &&
+      clientX <= trashElement.right &&
+      clientY >= trashElement.top &&
+      clientY <= trashElement.bottom
+    ) {
+      // Supprimer le nœud
+      setNodes((nds) => nds.filter((n) => n.id !== node.id));
+      // Supprimer également les arêtes associées
+      setEdges((eds) =>
+        eds.filter((e) => e.source !== node.id && e.target !== node.id)
+      );
+    }
+  };
+
   // Calculer l'objet de sortie à partir des nœuds et des arêtes
   const outputGraph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
 
@@ -83,24 +107,34 @@ export const GraphPanel = () => {
           <FunctionButtons onFunctionClick={handleFunctionClick} />
         </OutputGraphMenu>
       </div>
+
+      <div className="absolute top-4 right-4 z-10">
+        <OutputGraphMenu title="Output">
+          <h2>Données du graphe (JSON)</h2>
+          <TextEditor initialValue={outputGraph} height={35} />
+        </OutputGraphMenu>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
       >
         {/* <MiniMap position="top-right" /> */}
-        <div className="absolute top-4 right-4 z-10">
-          <OutputGraphMenu title="Output">
-            <h2>Données du graphe (JSON)</h2>
-            <TextEditor initialValue={outputGraph} height={35} />
-          </OutputGraphMenu>
-        </div>
-
         <Controls position="bottom-right" />
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
+
+      {/* Poubelle pour supprimer les nœuds */}
+      <div
+        ref={trashRef}
+        className="absolute bottom-4 left-4 z-10 flex items-center justify-center w-16 h-16 bg-red-600 text-white rounded-full shadow-lg cursor-pointer"
+      >
+        <Trash2 className="w-8 h-8" />
+      </div>
     </div>
   );
 };
