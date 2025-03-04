@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { FunctionPanel } from "./FunctionPanel";
+import { FunctionPanel } from "./functions/FunctionPanel";
 import { GraphPanel } from "./GraphPanel";
 
 const DevPanel = () => {

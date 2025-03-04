@@ -7,27 +7,19 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  BackgroundVariant,
+  Node,
+  Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import OutputGraphMenu from "./OutputGraphMenu";
-import FunctionButtons from "./FunctionButtons";
-import TextEditor from "./TextEditor";
+import OutputGraphMenu from "./text/OutputGraphMenu";
+import FunctionButtons from "./functions/FunctionButtons";
+import TextEditor from "./text/TextEditor";
 import { Trash2 } from "lucide-react";
 
 interface NodeData {
   label: string;
-}
-
-interface Node {
-  id: string;
-  position: { x: number; y: number };
-  data: NodeData;
-}
-
-interface Edge {
-  id: string;
-  source: string;
-  target: string;
+  [key: string]: unknown;
 }
 
 const initialNodes = [
@@ -66,7 +58,7 @@ export const GraphPanel = () => {
     attributes: Record<string, any>;
   }) => {
     const newId = (nodes.length + 1).toString();
-    const newNode: Node = {
+    const newNode: Node<NodeData> = {
       id: newId,
       // Position aléatoire pour l'exemple, vous pouvez adapter la logique
       position: { x: Math.random() * 500, y: Math.random() * 500 },
@@ -125,7 +117,7 @@ export const GraphPanel = () => {
       >
         {/* <MiniMap position="top-right" /> */}
         <Controls position="bottom-right" />
-        <Background variant="dots" gap={12} size={1} />
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
 
       {/* Poubelle pour supprimer les nœuds */}

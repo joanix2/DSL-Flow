@@ -1,5 +1,5 @@
 import FunctionButtons from "./FunctionButtons";
-import TextEditor from "./TextEditor";
+import TextEditor from "../text/TextEditor";
 
 export const FunctionPanel = () => {
   const user = {
