@@ -1,25 +1,50 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button"; // Assurez-vous que le chemin est correct selon votre configuration
+import { Button } from "@/components/ui/button"; // Assurez-vous que le chemin est correct
 
-const FunctionButtons = () => {
-  // État initial contenant quelques fonctions (ici, simplement des noms)
-  const [functions, setFunctions] = useState([
-    "Fonction 1",
-    "Fonction 2",
-    "Fonction 3",
+// Définition du type pour représenter une fonction
+export interface MyFunction {
+  name: string;
+  attributes: Record<string, any>;
+}
+
+// Props du composant incluant le callback optionnel
+interface FunctionButtonsProps {
+  onFunctionClick?: (fn: MyFunction) => void;
+}
+
+const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
+  // État initial contenant quelques fonctions avec un nom et un dictionnaire d'attributs
+  const [functions, setFunctions] = useState<MyFunction[]>([
+    {
+      name: "Fonction 1",
+      attributes: { description: "Description de la fonction 1" },
+    },
+    {
+      name: "Fonction 2",
+      attributes: { description: "Description de la fonction 2" },
+    },
+    {
+      name: "Fonction 3",
+      attributes: { description: "Description de la fonction 3" },
+    },
   ]);
 
   // Gérer le clic sur un bouton de fonction
-  const handleFunctionClick = (fn: string) => {
+  const handleFunctionClick = (fn: MyFunction) => {
     console.log("Fonction sélectionnée :", fn);
-    // Vous pouvez ajouter ici la logique liée à la fonction sélectionnée
+    // Si un callback a été passé en prop, on le déclenche
+    if (onFunctionClick) {
+      onFunctionClick(fn);
+    }
   };
 
   // Ajouter une nouvelle fonction via une invite de commande
   const addFunction = () => {
     const newFunctionName = prompt("Entrez le nom de la nouvelle fonction :");
     if (newFunctionName) {
-      setFunctions([...functions, newFunctionName]);
+      // Pour simplifier, on initialise les attributs à un objet vide
+      const newFunction: MyFunction = { name: newFunctionName, attributes: {} };
+      setFunctions([...functions, newFunction]);
     }
   };
 
@@ -28,11 +53,11 @@ const FunctionButtons = () => {
       {functions.map((fn, index) => (
         <Button
           key={index}
-          variant="default"
+          variant="outline"
           onClick={() => handleFunctionClick(fn)}
           className="w-full"
         >
-          {fn}
+          {fn.name}
         </Button>
       ))}
       {/* Bouton pour ajouter une nouvelle fonction */}

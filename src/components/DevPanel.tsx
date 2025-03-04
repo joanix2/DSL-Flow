@@ -5,7 +5,7 @@ import { FunctionPanel } from "./FunctionPanel";
 import { GraphPanel } from "./GraphPanel";
 
 const DevPanel = () => {
-  const [activeTab, setActiveTab] = useState("function");
+  const [activeTab, setActiveTab] = useState("graph");
 
   return (
     <div className="flex w-full h-full p-4">
