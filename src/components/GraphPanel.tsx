@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -9,7 +9,6 @@ import {
   addEdge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { BlockMenu } from "./BlockMenu";
 import OutputGraphMenu from "./OutputGraphMenu";
 import FunctionButtons from "./FunctionButtons";
 import TextEditor from "./TextEditor";
@@ -41,7 +40,21 @@ export const GraphPanel = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
-    (params: Edge | any) => setEdges((eds: Edge[]) => addEdge(params, eds)),
+    (params: Edge | any) =>
+      setEdges((eds: Edge[]) =>
+        addEdge(
+          {
+            ...params,
+            markerEnd: {
+              type: "arrowclosed", // Type de flèche fermé
+              width: 20,
+              height: 20,
+              color: "#000",
+            },
+          },
+          eds
+        )
+      ),
     [setEdges]
   );
 
@@ -60,6 +73,9 @@ export const GraphPanel = () => {
     setNodes((nds) => [...nds, newNode]);
   };
 
+  // Calculer l'objet de sortie à partir des nœuds et des arêtes
+  const outputGraph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       <div className="absolute top-4 left-4 z-10 ">
@@ -77,8 +93,8 @@ export const GraphPanel = () => {
         {/* <MiniMap position="top-right" /> */}
         <div className="absolute top-4 right-4 z-10">
           <OutputGraphMenu title="Output">
-            <h2>Données du graphe au format json</h2>
-            <TextEditor initialValue={initialNodes} />
+            <h2>Données du graphe (JSON)</h2>
+            <TextEditor initialValue={outputGraph} height={35} />
           </OutputGraphMenu>
         </div>
 

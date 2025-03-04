@@ -18,15 +18,15 @@ export const FunctionPanel = () => {
         <h2 className="text-xl font-semibold mb-2">
           Paramètres de la fonction
         </h2>
-        <TextEditor initialValue={user} height="100px" />
+        <TextEditor initialValue={user} height={10} />
         <h2 className="text-xl font-semibold mb-2">Templates</h2>
-        <TextEditor initialValue={user} height="600px" />
+        <TextEditor initialValue={user} height={30} />
       </div>
       <div className="flex flex-col w-1/3 gap-4">
         <h2 className="text-xl font-semibold mb-2">Données de tests</h2>
-        <TextEditor initialValue={user} height="100px" />
+        <TextEditor initialValue={user} height={10} />
         <h2 className="text-xl font-semibold mb-2">Résultat</h2>
-        <TextEditor initialValue={user} height="600px" />
+        <TextEditor initialValue={user} height={30} />
       </div>
     </div>
   );

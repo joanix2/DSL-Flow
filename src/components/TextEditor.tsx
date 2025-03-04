@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import AceEditor from "react-ace";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,26 @@ import { Button } from "@/components/ui/button";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-monokai";
 
-function TextEditor({ initialValue, height = "300px" }) {
+interface TextEditorProps {
+  initialValue: string | object;
+  height?: number;
+}
+
+function TextEditor({ initialValue, height = 300 }: TextEditorProps) {
   const [value, setValue] = useState(
     typeof initialValue === "object"
       ? JSON.stringify(initialValue, null, 2)
       : initialValue
   );
+
+  // Mettre à jour l'état quand initialValue change
+  useEffect(() => {
+    setValue(
+      typeof initialValue === "object"
+        ? JSON.stringify(initialValue, null, 2)
+        : initialValue
+    );
+  }, [initialValue]);
 
   const copyToClipboard = () => {
     navigator.clipboard
@@ -50,7 +64,8 @@ function TextEditor({ initialValue, height = "300px" }) {
           tabSize: 2,
         }}
         width="100%"
-        height={height}
+        minLines={height ?? value.split("\n").length}
+        maxLines={height ?? value.split("\n").length}
       />
     </div>
   );
