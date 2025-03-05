@@ -1,0 +1,3 @@
+- créer des nodes custom pour gérer les fonctions
+- ajouter une valeur par défaut dans les fonctions
+- créer un service pour la gestion des fonctions 
