@@ -44,7 +44,7 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   const handleAttributeChange = (
     id: string,
     key: keyof FunctionAttributeTemplate,
-    value: any
+    value: unknown
   ) => {
     setAttributes((prev) =>
       prev.map((attr) => (attr.id === id ? { ...attr, [key]: value } : attr))
@@ -66,8 +66,8 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Créer une nouvelle fonction</DialogTitle>
         </DialogHeader>

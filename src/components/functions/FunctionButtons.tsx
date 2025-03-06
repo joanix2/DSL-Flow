@@ -27,27 +27,29 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Boutons pour les fonctions existantes */}
-      {functions.map((fn) => (
+    <div>
+      <div className="flex flex-col gap-2">
+        {/* Boutons pour les fonctions existantes */}
+        {functions.map((fn) => (
+          <Button
+            key={fn.id} // Utilisation correcte de la clé unique
+            variant="outline"
+            onClick={() => handleFunctionClick(fn)}
+            className="w-full"
+          >
+            {fn.name}
+          </Button>
+        ))}
+
+        {/* Bouton pour ajouter une nouvelle fonction */}
         <Button
-          key={fn.id} // Utilisation correcte de la clé unique
+          onClick={() => setIsModalOpen(true)}
           variant="outline"
-          onClick={() => handleFunctionClick(fn)}
           className="w-full"
         >
-          {fn.name}
+          +
         </Button>
-      ))}
-
-      {/* Bouton pour ajouter une nouvelle fonction */}
-      <Button
-        onClick={() => setIsModalOpen(true)}
-        variant="outline"
-        className="w-full"
-      >
-        +
-      </Button>
+      </div>
 
       {/* Modale de création */}
       {isModalOpen && (
