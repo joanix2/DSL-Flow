@@ -1,3 +1,5 @@
-- créer des nodes custom pour gérer les fonctions
 - ajouter une valeur par défaut dans les fonctions
-- créer un service pour la gestion des fonctions 
+- corriger les selcteur de nombre
+- quand une valeur de fonction est changée mettre à jour le json
+- quand le json est changé, modifie le graphe
+- ajouter un bouton pour mettre à jour le json

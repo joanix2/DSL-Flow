@@ -15,17 +15,18 @@ import OutputGraphMenu from "./text/OutputGraphMenu";
 import FunctionButtons from "./functions/FunctionButtons";
 import TextEditor from "./text/TextEditor";
 import { Trash2 } from "lucide-react";
+import { FunctionInstance, FunctionTemplate } from "../services/DataTypes";
+import FunctionNodeComponent from "./FunctionNodeComponent";
 
-interface NodeData {
-  label: string;
-  [key: string]: unknown;
-}
+// Définition des nœuds personnalisés
+const nodeTypes = {
+  functionNode: FunctionNodeComponent,
+};
 
-const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
-];
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
+// Nœuds et arêtes initiales
+const initialNodes: Node[] = [];
+
+const initialEdges: Edge[] = [{ id: "e1-2", source: "1", target: "2" }];
 
 export const GraphPanel = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -39,7 +40,7 @@ export const GraphPanel = () => {
           {
             ...params,
             markerEnd: {
-              type: "arrowclosed", // Type de flèche fermé
+              type: "arrowclosed", // Type de flèche fermée
               width: 20,
               height: 20,
               color: "#000",
@@ -51,22 +52,56 @@ export const GraphPanel = () => {
     [setEdges]
   );
 
-  // Callback qui crée un nouveau nœud dont le label est le nom de la fonction
-  const handleFunctionClick = (fn: {
-    name: string;
-    attributes: Record<string, any>;
-  }) => {
-    const newId = (nodes.length + 1).toString();
-    const newNode: Node<NodeData> = {
+  // Fonction pour créer une instance de fonction en tant que nœud ReactFlow
+  const createFunctionInstance = (template: FunctionTemplate) => {
+    const newId = `fn-${nodes.length + 1}`;
+
+    const newInstance: FunctionInstance = {
       id: newId,
-      // Position aléatoire pour l'exemple, vous pouvez adapter la logique
-      position: { x: Math.random() * 500, y: Math.random() * 500 },
-      data: { label: fn.name },
+      templateId: template.id,
+      values: template.attributes.reduce((acc, attr) => {
+        acc[attr.name] = attr.type === "boolean" ? false : ""; // Valeurs par défaut
+        return acc;
+      }, {} as Record<string, string | number | boolean>),
     };
+
+    const newNode: Node = {
+      id: newId,
+      type: "functionNode",
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      data: {
+        functionInstance: newInstance,
+        onUpdate: (
+          updatedValues: Record<string, string | number | boolean>
+        ) => {
+          setNodes((nds) =>
+            nds.map((n) =>
+              n.id === newId
+                ? {
+                    ...n,
+                    data: {
+                      ...n.data,
+                      functionInstance: {
+                        ...(n.data.functionInstance as FunctionInstance),
+                        values: updatedValues,
+                      },
+                    },
+                  }
+                : n
+            )
+          );
+        },
+      },
+    };
+
     setNodes((nds) => [...nds, newNode]);
   };
 
-  // Lorsqu'un nœud termine d'être déplacé, vérifier s'il a été déposé sur la poubelle
+  // Gestion du clic sur une fonction pour créer une instance
+  const handleFunctionClick = (fnTemplate: FunctionTemplate) => {
+    createFunctionInstance(fnTemplate);
+  };
+
   // Vérifier si un nœud est déplacé sur la poubelle et le supprimer
   const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
     const trashElement = trashRef.current?.getBoundingClientRect();
@@ -79,9 +114,7 @@ export const GraphPanel = () => {
       clientY >= trashElement.top &&
       clientY <= trashElement.bottom
     ) {
-      // Supprimer le nœud
       setNodes((nds) => nds.filter((n) => n.id !== node.id));
-      // Supprimer également les arêtes associées
       setEdges((eds) =>
         eds.filter((e) => e.source !== node.id && e.target !== node.id)
       );
@@ -93,12 +126,14 @@ export const GraphPanel = () => {
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
-      <div className="absolute top-4 left-4 z-10 ">
+      {/* Menu Fonctions */}
+      <div className="absolute top-4 left-4 z-10">
         <OutputGraphMenu title="Fonctions" alignRight={false}>
           <FunctionButtons onFunctionClick={handleFunctionClick} />
         </OutputGraphMenu>
       </div>
 
+      {/* Affichage des données du graphe */}
       <div className="absolute top-4 right-4 z-10">
         <OutputGraphMenu title="Output">
           <h2>Données du graphe (JSON)</h2>
@@ -106,6 +141,7 @@ export const GraphPanel = () => {
         </OutputGraphMenu>
       </div>
 
+      {/* ReactFlow avec les nœuds et connexions */}
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -113,8 +149,8 @@ export const GraphPanel = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDragStop={onNodeDragStop}
+        nodeTypes={nodeTypes} // Ajout du nœud customisé
       >
-        {/* <MiniMap position="top-right" /> */}
         <Controls position="bottom-right" />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>

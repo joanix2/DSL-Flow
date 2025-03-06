@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button"; // Assurez-vous que le chemin est correct
-import { FunctionTemplate } from "../DataTypes";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import FunctionCreationModal from "./FunctionCreationModal";
+import { FunctionTemplate } from "@/services/DataTypes";
+import FunctionService from "@/services/FunctionService";
 
 interface FunctionButtonsProps {
   onFunctionClick?: (fn: FunctionTemplate) => void;
@@ -11,14 +12,18 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [functions, setFunctions] = useState<FunctionTemplate[]>([]);
 
-  // Gérer la création d'une nouvelle fonction
+  // Charger les fonctions existantes
+  useEffect(() => {
+    setFunctions(FunctionService.getFunctions());
+  }, []);
+
+  // Ajouter une nouvelle fonction
   const handleCreateFunction = (newFunction: FunctionTemplate) => {
-    setFunctions((prev) => [...prev, newFunction]);
-    setIsModalOpen(false); // Ferme la modale seulement si la création réussit
-    console.log("Nouvelle fonction ajoutée :", newFunction);
+    FunctionService.addFunction(newFunction);
+    setFunctions([...FunctionService.getFunctions()]);
+    setIsModalOpen(false);
   };
 
-  // Gérer le clic sur un bouton de fonction
   const handleFunctionClick = (fn: FunctionTemplate) => {
     console.log("Fonction sélectionnée :", fn);
     if (onFunctionClick) {
@@ -29,10 +34,9 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
   return (
     <div>
       <div className="flex flex-col gap-2">
-        {/* Boutons pour les fonctions existantes */}
         {functions.map((fn) => (
           <Button
-            key={fn.id} // Utilisation correcte de la clé unique
+            key={fn.id}
             variant="outline"
             onClick={() => handleFunctionClick(fn)}
             className="w-full"
@@ -41,7 +45,6 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
           </Button>
         ))}
 
-        {/* Bouton pour ajouter une nouvelle fonction */}
         <Button
           onClick={() => setIsModalOpen(true)}
           variant="outline"
@@ -51,7 +54,6 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
         </Button>
       </div>
 
-      {/* Modale de création */}
       {isModalOpen && (
         <FunctionCreationModal
           open={isModalOpen}

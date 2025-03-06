@@ -16,7 +16,10 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { FunctionAttributeTemplate, FunctionTemplate } from "../DataTypes";
+import {
+  FunctionAttributeTemplate,
+  FunctionTemplate,
+} from "../../services/DataTypes";
 
 interface FunctionCreationModalProps {
   open: boolean;
@@ -44,7 +47,7 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   const handleAttributeChange = (
     id: string,
     key: keyof FunctionAttributeTemplate,
-    value: unknown
+    value: any
   ) => {
     setAttributes((prev) =>
       prev.map((attr) => (attr.id === id ? { ...attr, [key]: value } : attr))
@@ -66,8 +69,8 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent onClick={(e) => e.stopPropagation()}>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Créer une nouvelle fonction</DialogTitle>
         </DialogHeader>
