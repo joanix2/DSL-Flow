@@ -47,7 +47,7 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   const handleAttributeChange = (
     id: string,
     key: keyof FunctionAttributeTemplate,
-    value: any
+    value: unknown
   ) => {
     setAttributes((prev) =>
       prev.map((attr) => (attr.id === id ? { ...attr, [key]: value } : attr))
@@ -88,32 +88,44 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
         {attributes.map((attr) => (
           <div key={attr.id} className="flex gap-2 items-center mb-3">
             {/* Sélecteur du type */}
-            <Select
-              onValueChange={(value) =>
-                handleAttributeChange(attr.id, "type", value)
-              }
-              defaultValue={attr.type}
-            >
-              <SelectTrigger className="w-1/4">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="text">Texte</SelectItem>
-                <SelectItem value="number">Nombre</SelectItem>
-                <SelectItem value="color">Couleur</SelectItem>
-                <SelectItem value="boolean">Booléen</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-row items-center w-full gap-2">
+              <Select
+                onValueChange={(value) =>
+                  handleAttributeChange(attr.id, "type", value)
+                }
+                defaultValue={attr.type}
+              >
+                <SelectTrigger className="w-1/3">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Texte</SelectItem>
+                  <SelectItem value="number">Nombre</SelectItem>
+                  <SelectItem value="color">Couleur</SelectItem>
+                  <SelectItem value="boolean">Booléen</SelectItem>
+                </SelectContent>
+              </Select>
 
-            {/* Nom de l'attribut */}
-            <Input
-              placeholder="Nom de l'attribut"
-              value={attr.name}
-              onChange={(e) =>
-                handleAttributeChange(attr.id, "name", e.target.value)
-              }
-              className="w-1/3"
-            />
+              {/* Nom de l'attribut */}
+              <Input
+                placeholder="Nom de l'attribut"
+                value={attr.name}
+                onChange={(e) =>
+                  handleAttributeChange(attr.id, "name", e.target.value)
+                }
+                className="w-1/3"
+              />
+
+              {/* Nom de l'attribut */}
+              <Input
+                placeholder="Valeur par défaut"
+                value={attr.defaultValue?.toString()}
+                onChange={(e) =>
+                  handleAttributeChange(attr.id, "defaultValue", e.target.value)
+                }
+                className="w-1/3"
+              />
+            </div>
 
             {/* Bouton de suppression */}
             <Button

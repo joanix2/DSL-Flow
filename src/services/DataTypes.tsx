@@ -5,6 +5,7 @@ type AttributeType = "text" | "number" | "color" | "boolean";
 export interface FunctionAttributeTemplate {
   id: string; // Un identifiant unique pour l'attribut
   name: string;
+  defaultValue?: string | number | boolean; // Valeur par défaut
   type: AttributeType;
 }
 

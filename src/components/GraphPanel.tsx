@@ -60,7 +60,8 @@ export const GraphPanel = () => {
       id: newId,
       templateId: template.id,
       values: template.attributes.reduce((acc, attr) => {
-        acc[attr.name] = attr.type === "boolean" ? false : ""; // Valeurs par défaut
+        acc[attr.name] =
+          attr.defaultValue ?? (attr.type === "boolean" ? false : ""); // Valeurs par défaut
         return acc;
       }, {} as Record<string, string | number | boolean>),
     };
