@@ -18,6 +18,14 @@ class FunctionService {
   deleteFunction(id: string) {
     delete this.functions[id];
   }
+
+  updateFunction(updatedFn: FunctionTemplate) {
+    if (this.functions[updatedFn.id]) {
+      this.functions[updatedFn.id] = updatedFn;
+    } else {
+      console.warn(`Function with ID ${updatedFn.id} not found.`);
+    }
+  }
 }
 
 export default new FunctionService();

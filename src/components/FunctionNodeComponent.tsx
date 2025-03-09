@@ -28,6 +28,8 @@ const FunctionNodeComponent: React.FC<FunctionNodeProps> = ({ data }) => {
 
   // Met à jour la valeur d'un attribut
   const handleChange = (key: string, value: string | number | boolean) => {
+    if (values[key] === value) return; // Évite la mise à jour inutile
+
     const updatedValues = { ...values, [key]: value };
     setValues(updatedValues);
     onUpdate(updatedValues);
@@ -55,7 +57,9 @@ const FunctionNodeComponent: React.FC<FunctionNodeProps> = ({ data }) => {
             <input
               type="number"
               value={values[attr.name] as number}
-              onChange={(e) => handleChange(attr.name, Number(e.target.value))}
+              onChange={(e) =>
+                handleChange(attr.name, parseFloat(e.target.value))
+              }
               className="w-full border px-2 py-1 rounded"
             />
           )}

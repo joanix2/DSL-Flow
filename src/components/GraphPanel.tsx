@@ -26,7 +26,7 @@ const nodeTypes = {
 // Nœuds et arêtes initiales
 const initialNodes: Node[] = [];
 
-const initialEdges: Edge[] = [{ id: "e1-2", source: "1", target: "2" }];
+const initialEdges: Edge[] = [];
 
 export const GraphPanel = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);

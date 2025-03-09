@@ -23,17 +23,21 @@ import {
 
 interface FunctionCreationModalProps {
   open: boolean;
+  editingFunction: FunctionTemplate | null;
   onClose: () => void;
   onCreate: (template: FunctionTemplate) => void;
 }
 
 const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   open,
+  editingFunction,
   onClose,
   onCreate,
 }) => {
-  const [functionName, setFunctionName] = useState("");
-  const [attributes, setAttributes] = useState<FunctionAttributeTemplate[]>([]);
+  const [functionName, setFunctionName] = useState(editingFunction?.name || "");
+  const [attributes, setAttributes] = useState<FunctionAttributeTemplate[]>(
+    editingFunction?.attributes || []
+  );
 
   // Ajouter un nouvel attribut
   const handleAddAttribute = () => {
@@ -62,7 +66,11 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   // Création du modèle de fonction
   const handleCreate = () => {
     if (!functionName.trim()) return alert("Le nom de la fonction est requis.");
-    onCreate({ id: crypto.randomUUID(), name: functionName, attributes });
+    onCreate({
+      id: editingFunction?.id || crypto.randomUUID(),
+      name: functionName,
+      attributes,
+    });
     onClose();
     setFunctionName("");
     setAttributes([]);
