@@ -9,6 +9,7 @@ import {
   BackgroundVariant,
   Node,
   Edge,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import OutputGraphMenu from "./text/OutputGraphMenu";
@@ -29,6 +30,7 @@ const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
 export const GraphPanel = () => {
+  // const { screenToFlowPosition } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const trashRef = useRef<HTMLDivElement>(null);
@@ -58,18 +60,24 @@ export const GraphPanel = () => {
 
     const newInstance: FunctionInstance = {
       id: newId,
-      templateId: template.id,
-      values: template.attributes.reduce((acc, attr) => {
-        acc[attr.name] =
-          attr.defaultValue ?? (attr.type === "boolean" ? false : ""); // Valeurs par défaut
-        return acc;
-      }, {} as Record<string, string | number | boolean>),
+      templateTag: template.tag,
+      values: Object.fromEntries(
+        Object.entries(template.attributes).map(([key, attr]) => [
+          key,
+          attr.defaultValue ?? (attr.type === "boolean" ? false : ""),
+        ])
+      ),
+    };
+
+    const { x, y } = {
+      x: window.innerWidth / 2 - 200 + Math.random() * 200,
+      y: window.innerHeight / 2 - 100 + Math.random() * 200,
     };
 
     const newNode: Node = {
       id: newId,
       type: "functionNode",
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      position: { x, y },
       data: {
         functionInstance: newInstance,
         onUpdate: (
@@ -143,18 +151,20 @@ export const GraphPanel = () => {
       </div>
 
       {/* ReactFlow avec les nœuds et connexions */}
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeDragStop={onNodeDragStop}
-        nodeTypes={nodeTypes} // Ajout du nœud customisé
-      >
-        <Controls position="bottom-right" />
-        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-      </ReactFlow>
+      <ReactFlowProvider>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeDragStop={onNodeDragStop}
+          nodeTypes={nodeTypes} // Ajout du nœud customisé
+        >
+          <Controls position="bottom-right" />
+          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+        </ReactFlow>
+      </ReactFlowProvider>
 
       {/* Poubelle pour supprimer les nœuds */}
       <div
