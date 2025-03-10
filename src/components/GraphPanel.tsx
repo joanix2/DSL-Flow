@@ -9,6 +9,7 @@ import {
   BackgroundVariant,
   Node,
   Edge,
+  Connection,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import OutputGraphMenu from "./text/OutputGraphMenu";
@@ -35,7 +36,7 @@ export const GraphPanel = () => {
   const trashRef = useRef<HTMLDivElement>(null);
 
   const onConnect = useCallback(
-    (params: Edge | any) =>
+    (params: Connection) =>
       setEdges((eds: Edge[]) =>
         addEdge(
           {
@@ -46,7 +47,7 @@ export const GraphPanel = () => {
               height: 20,
               color: "#000",
             },
-          },
+          } as Edge, // Assure que l'objet correspond bien au type Edge
           eds
         )
       ),
@@ -130,7 +131,16 @@ export const GraphPanel = () => {
   };
 
   // Calculer l'objet de sortie à partir des nœuds et des arêtes
-  const outputGraph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+  const outputGraph = useMemo(
+    () => ({
+      nodes: nodes.map((node) => node.data.functionInstance),
+      edges: edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+      })),
+    }),
+    [nodes, edges]
+  );
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
