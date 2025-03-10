@@ -8,6 +8,8 @@ const client = new ApolloClient({
 });
 
 class FunctionService {
+  private functions: Record<string, FunctionTemplate> = {};
+
   async addFunction(fn: FunctionTemplate): Promise<FunctionTemplate | null> {
     const mutation = gql`
       mutation CreateFunctionTemplate($tag: String!, $attributes: JSONString) {
@@ -47,10 +49,16 @@ class FunctionService {
 
     try {
       const { data } = await client.query({ query });
-      return data.allFunctionTemplates.map((fn: FunctionTemplate) => ({
-        tag: fn.tag,
-        attributes: JSON.parse(fn.attributes.toString()),
-      }));
+      const functions = data.allFunctionTemplates.map(
+        (fn: FunctionTemplate) => ({
+          tag: fn.tag,
+          attributes: fn.attributes,
+        })
+      );
+
+      this.functions = functions;
+
+      return functions;
     } catch (error) {
       console.error("Error fetching functions:", error);
       return [];
@@ -101,34 +109,7 @@ class FunctionService {
   }
 
   async getFunctionByTag(tag: string): Promise<FunctionTemplate | null> {
-    const query = gql`
-      query GetFunctionTemplate($tag: String!) {
-        functionTemplate(tag: $tag) {
-          tag
-          attributes
-          createdAt
-        }
-      }
-    `;
-
-    try {
-      const { data } = await client.query({
-        query,
-        variables: { tag },
-      });
-
-      if (data.functionTemplate) {
-        return {
-          tag: data.functionTemplate.tag,
-          attributes: JSON.parse(data.functionTemplate.attributes),
-        };
-      }
-
-      return null;
-    } catch (error) {
-      console.error(`Error fetching function with tag ${tag}:`, error);
-      return null;
-    }
+    return this.functions[tag] || null;
   }
 }
 

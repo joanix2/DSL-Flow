@@ -1,8 +1,6 @@
-suppimer des noeud
-
-mettre l'aafichage des noeud à jour quand il sont créer
-editer de noeud
-intancier des neoud
+- mettre l'affichage des noeuds à jour quand il sont créer
+- editer de noeud
+- instancier des neouds
 
 - corriger les selecteur de nombre
 - quand une valeur de fonction est changée mettre à jour le json
