@@ -66,10 +66,15 @@ export const GraphPanel = () => {
       }, {} as Record<string, string | number | boolean>),
     };
 
+    const { x, y } = {
+      x: window.innerWidth / 2 - 200 + Math.random() * 200,
+      y: window.innerHeight / 2 - 100 + Math.random() * 200,
+    };
+
     const newNode: Node = {
       id: newId,
       type: "functionNode",
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      position: { x, y },
       data: {
         functionInstance: newInstance,
         onUpdate: (
