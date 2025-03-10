@@ -17,7 +17,10 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
 
   // Charger les fonctions existantes
   useEffect(() => {
-    setFunctions(FunctionService.getFunctions());
+    FunctionService.getFunctions().then((fns) => {
+      console.log(fns);
+      setFunctions(fns);
+    });
   }, []);
 
   // Ajouter ou mettre à jour une fonction
@@ -28,7 +31,7 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
     } else {
       FunctionService.addFunction(newFunction); // Ajouter
     }
-    setFunctions(FunctionService.getFunctions());
+    FunctionService.getFunctions().then((fns) => setFunctions(fns));
     setIsModalOpen(false);
     setEditingFunction(null);
   };
@@ -36,7 +39,7 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
   // Supprimer une fonction
   const handleDeleteFunction = (id: string) => {
     FunctionService.deleteFunction(id);
-    setFunctions([...FunctionService.getFunctions()]);
+    FunctionService.getFunctions().then((fns) => setFunctions([...fns]));
   };
 
   // Gérer la sélection d'une fonction
@@ -57,13 +60,13 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
     <div>
       <div className="flex flex-col gap-2">
         {functions.map((fn) => (
-          <div className="flex flex-row gap-2 items-center w-full" key={fn.id}>
+          <div className="flex flex-row gap-2 items-center w-full" key={fn.tag}>
             <Button
               variant="outline"
               onClick={() => handleFunctionClick(fn)}
-              className="w-64"
+              className="flex-1"
             >
-              {fn.name}
+              {fn.tag}
             </Button>
             <Button
               className="h-10 w-10 justify-center items-center"
@@ -75,7 +78,7 @@ const FunctionButtons = ({ onFunctionClick }: FunctionButtonsProps) => {
             <Button
               className="h-10 w-10 justify-center items-center"
               variant="ghost"
-              onClick={() => handleDeleteFunction(fn.id)}
+              onClick={() => handleDeleteFunction(fn.tag)}
             >
               <Trash2 className="w-4 h-4 text-red-500" />
             </Button>

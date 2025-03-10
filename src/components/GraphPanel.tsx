@@ -29,6 +29,7 @@ const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
 export const GraphPanel = () => {
+  // const { screenToFlowPosition } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const trashRef = useRef<HTMLDivElement>(null);
@@ -58,12 +59,13 @@ export const GraphPanel = () => {
 
     const newInstance: FunctionInstance = {
       id: newId,
-      templateId: template.id,
-      values: template.attributes.reduce((acc, attr) => {
-        acc[attr.name] =
-          attr.defaultValue ?? (attr.type === "boolean" ? false : ""); // Valeurs par défaut
-        return acc;
-      }, {} as Record<string, string | number | boolean>),
+      templateTag: template.tag,
+      values: Object.fromEntries(
+        Object.entries(template.attributes).map(([key, attr]) => [
+          key,
+          attr.defaultValue ?? (attr.type === "boolean" ? false : ""),
+        ])
+      ),
     };
 
     const { x, y } = {

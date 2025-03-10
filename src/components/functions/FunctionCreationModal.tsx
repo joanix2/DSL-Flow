@@ -16,10 +16,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  FunctionAttributeTemplate,
-  FunctionTemplate,
-} from "../../services/DataTypes";
+import { AttributeType, FunctionTemplate } from "../../services/DataTypes";
 
 interface FunctionCreationModalProps {
   open: boolean;
@@ -28,51 +25,91 @@ interface FunctionCreationModalProps {
   onCreate: (template: FunctionTemplate) => void;
 }
 
+interface FunctionAttributeTemplateInput {
+  name: string;
+  defaultValue?: string | number | boolean; // Valeur par défaut
+  type: AttributeType;
+}
+
 const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
   open,
   editingFunction,
   onClose,
   onCreate,
 }) => {
-  const [functionName, setFunctionName] = useState(editingFunction?.name || "");
-  const [attributes, setAttributes] = useState<FunctionAttributeTemplate[]>(
-    editingFunction?.attributes || []
+  const [functionTag, setFunctionTag] = useState(editingFunction?.tag || "");
+  const [attributes, setAttributes] = useState<
+    FunctionAttributeTemplateInput[]
+  >(
+    editingFunction
+      ? Object.entries(editingFunction.attributes).map(
+          ([key, attribute], index) => ({
+            name: key || `attribute-${index}`,
+            defaultValue:
+              attribute?.defaultValue !== undefined
+                ? attribute.defaultValue
+                : attribute?.type === "boolean"
+                ? false
+                : "",
+            type: attribute?.type || "text",
+          })
+        )
+      : []
   );
 
   // Ajouter un nouvel attribut
   const handleAddAttribute = () => {
     setAttributes([
       ...attributes,
-      { id: crypto.randomUUID(), name: "", type: "text" },
+      {
+        type: "text",
+        name: "",
+      },
     ]);
   };
 
   // Met à jour un attribut existant
   const handleAttributeChange = (
-    id: string,
-    key: keyof FunctionAttributeTemplate,
+    name: string,
+    key: keyof FunctionAttributeTemplateInput,
     value: unknown
   ) => {
     setAttributes((prev) =>
-      prev.map((attr) => (attr.id === id ? { ...attr, [key]: value } : attr))
+      prev.map((attr) =>
+        attr.name === name ? { ...attr, [key]: value } : attr
+      )
     );
   };
 
   // Supprimer un attribut
   const handleRemoveAttribute = (id: string) => {
-    setAttributes((prev) => prev.filter((attr) => attr.id !== id));
+    setAttributes((prev) => prev.filter((attr) => attr.name !== id));
   };
 
   // Création du modèle de fonction
   const handleCreate = () => {
-    if (!functionName.trim()) return alert("Le nom de la fonction est requis.");
-    onCreate({
-      id: editingFunction?.id || crypto.randomUUID(),
-      name: functionName,
-      attributes,
-    });
+    if (!functionTag.trim()) return alert("Le nom de la fonction est requis.");
+
+    const attributesRecord: Record<
+      string,
+      { type: AttributeType; defaultValue?: string | number | boolean }
+    > = Object.fromEntries(
+      attributes.map((attr) => [
+        attr.name,
+        { type: attr.type, defaultValue: attr.defaultValue },
+      ])
+    );
+
+    const functionTemplate: FunctionTemplate = {
+      tag: functionTag,
+      attributes: attributesRecord,
+    };
+
+    console.log("Nouvelle fonction :", functionTemplate);
+
+    onCreate(functionTemplate);
     onClose();
-    setFunctionName("");
+    setFunctionTag("");
     setAttributes([]);
   };
 
@@ -87,19 +124,19 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
         <div className="mb-4">
           <Input
             placeholder="Nom de la fonction"
-            value={functionName}
-            onChange={(e) => setFunctionName(e.target.value)}
+            value={functionTag}
+            onChange={(e) => setFunctionTag(e.target.value)}
           />
         </div>
 
         {/* Liste des attributs */}
-        {attributes.map((attr) => (
-          <div key={attr.id} className="flex gap-2 items-center mb-3">
+        {attributes.map((attr, index) => (
+          <div key={index} className="flex gap-2 items-center mb-3">
             {/* Sélecteur du type */}
             <div className="flex flex-row items-center w-full gap-2">
               <Select
                 onValueChange={(value) =>
-                  handleAttributeChange(attr.id, "type", value)
+                  handleAttributeChange(attr.name, "type", value)
                 }
                 defaultValue={attr.type}
               >
@@ -119,7 +156,7 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
                 placeholder="Nom de l'attribut"
                 value={attr.name}
                 onChange={(e) =>
-                  handleAttributeChange(attr.id, "name", e.target.value)
+                  handleAttributeChange(attr.name, "name", e.target.value)
                 }
                 className="w-1/3"
               />
@@ -129,7 +166,11 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
                 placeholder="Valeur par défaut"
                 value={attr.defaultValue?.toString()}
                 onChange={(e) =>
-                  handleAttributeChange(attr.id, "defaultValue", e.target.value)
+                  handleAttributeChange(
+                    attr.name,
+                    "defaultValue",
+                    e.target.value
+                  )
                 }
                 className="w-1/3"
               />
@@ -139,7 +180,7 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleRemoveAttribute(attr.id)}
+              onClick={() => handleRemoveAttribute(attr.name)}
             >
               <Trash2 className="w-5 h-5 text-red-500" />
             </Button>
@@ -161,7 +202,7 @@ const FunctionCreationModal: React.FC<FunctionCreationModalProps> = ({
             Annuler
           </Button>
           <Button variant="outline" onClick={handleCreate}>
-            Créer
+            {editingFunction ? "Modifier" : "Créer"}
           </Button>
         </DialogFooter>
       </DialogContent>

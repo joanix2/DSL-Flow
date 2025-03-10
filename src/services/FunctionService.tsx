@@ -4,14 +4,14 @@ class FunctionService {
   private functions: Record<string, FunctionTemplate> = {};
 
   addFunction(fn: FunctionTemplate) {
-    this.functions[fn.id] = fn;
+    this.functions[fn.tag] = fn;
   }
 
-  getFunctions(): FunctionTemplate[] {
+  async getFunctions(): Promise<FunctionTemplate[]> {
     return Object.values(this.functions);
   }
 
-  getFunctionById(id: string): FunctionTemplate | undefined {
+  getFunctionByTag(id: string): FunctionTemplate | undefined {
     return this.functions[id];
   }
 
@@ -20,10 +20,10 @@ class FunctionService {
   }
 
   updateFunction(updatedFn: FunctionTemplate) {
-    if (this.functions[updatedFn.id]) {
-      this.functions[updatedFn.id] = updatedFn;
+    if (this.functions[updatedFn.tag]) {
+      this.functions[updatedFn.tag] = updatedFn;
     } else {
-      console.warn(`Function with ID ${updatedFn.id} not found.`);
+      console.warn(`Function with ID ${updatedFn.tag} not found.`);
     }
   }
 }
